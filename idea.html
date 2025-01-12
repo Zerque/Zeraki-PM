@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idea Backlog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Idea Backlog</h1>
+        <nav>
+            <a href="landing.html">Back to Features</a>
+        </nav>
+    </header>
+    
+    <section>
+        <h2>Vote and promote features from the idea backlog to the product backlog.</h2>
+        <p>This page will display collected feedback from users. Vote on ideas to move them forward.</p>
+    </section>
+
+    <section class="container" id="feedback-list">
+        <!-- Feedback Cards will be dynamically loaded here -->
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Idea Backlog. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Sample feedback data (this would normally come from the backend)
+        const feedbacks = [
+            { id: 1, title: "Improve Search Functionality", description: "Users need better filtering options.", votes: 0 },
+            { id: 2, title: "Add Dark Mode", description: "A dark mode option for the website is requested.", votes: 0 },
+            { id: 3, title: "Faster Loading Times", description: "The app should load faster for a smoother user experience.", votes: 0 }
+        ];
+
+        // Function to render feedback
+        function renderFeedback() {
+            const feedbackList = document.getElementById('feedback-list');
+            feedbackList.innerHTML = ''; // Clear existing feedback list
+
+            feedbacks.forEach(feedback => {
+                const feedbackCard = document.createElement('div');
+                feedbackCard.classList.add('card');
+
+                feedbackCard.innerHTML = `
+                    <h3>${feedback.title}</h3>
+                    <p>${feedback.description}</p>
+                    <div class="vote-buttons">
+                        <button class="upvote" onclick="vote(${feedback.id}, 'up')">Upvote</button>
+                        <button class="downvote" onclick="vote(${feedback.id}, 'down')">Downvote</button>
+                        <span>Votes: <span id="votes-${feedback.id}">${feedback.votes}</span></span>
+                    </div>
+                `;
+
+                feedbackList.appendChild(feedbackCard);
+            });
+        }
+
+        // Voting function
+        function vote(feedbackId, type) {
+            const feedback = feedbacks.find(f => f.id === feedbackId);
+            if (type === 'up') {
+                feedback.votes++;
+            } else if (type === 'down') {
+                feedback.votes--;
+            }
+
+            // Update the vote count on the page
+            document.getElementById(`votes-${feedback.id}`).innerText = feedback.votes;
+        }
+
+        // Initial render of feedbacks
+        renderFeedback();
+    </script>
+</body>
+</html>
