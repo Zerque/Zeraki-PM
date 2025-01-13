@@ -1,22 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-    <link rel="stylesheet" href="styles.css"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Backlog</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
         <h1>Product Backlog</h1>
         <nav>
             <a href="landing.html">Back to Features</a>
+            <a href="idea.html">View Idea Backlog</a>
+            <a href="sprint.html">View Sprint Backlog</a>
         </nav>
     </header>
+
     <section>
-        <h2>Define user stories, acceptance criteria, and move features to sprints.</h2>
-        <p>This page will guide you through defining user stories and managing the backlog.</p>
-        <!-- Add more content as needed -->
+        <h2>Features promoted to the product backlog.</h2>
+        <p>This page displays features that have been moved from the idea backlog and are now ready for consideration in development.</p>
     </section>
+
+    <section class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-backlog-body">
+                <!-- Product backlog items will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Product Backlog. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Load product backlog from localStorage
+        function renderProductBacklog() {
+            const productBacklogBody = document.getElementById('product-backlog-body');
+            const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
+
+            productBacklogBody.innerHTML = ''; // Clear existing rows
+
+            productBacklog.forEach((item, index) => {
+                const backlogRow = document.createElement('tr');
+
+                backlogRow.innerHTML = `
+                    <td>${item.title}</td>
+                    <td>${item.description}</td>
+                    <td><button onclick="moveToSprint(${index})">Move to Sprint Backlog</button></td>
+                `;
+
+                productBacklogBody.appendChild(backlogRow);
+            });
+        }
+
+        // Move feature to sprint backlog
+        function moveToSprint(index) {
+            const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
+            const sprintBacklog = JSON.parse(localStorage.getItem('sprintBacklog')) || [];
+
+            if (productBacklog[index]) {
+                sprintBacklog.push(productBacklog[index]);
+                productBacklog.splice(index, 1);
+
+                localStorage.setItem('productBacklog', JSON.stringify(productBacklog));
+                localStorage.setItem('sprintBacklog', JSON.stringify(sprintBacklog));
+
+                renderProductBacklog();
+            }
+        }
+
+        // Initial render of product backlog
+        renderProductBacklog();
+    </script>
 </body>
 </html>
