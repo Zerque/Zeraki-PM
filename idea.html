@@ -13,18 +13,45 @@
             <a href="landing.html">Back to Features</a>
         </nav>
     </header>
-    
+
     <section>
         <h2>Vote and promote features from the idea backlog to the product backlog.</h2>
         <p>This page will display collected feedback from users. Vote on ideas to move them forward.</p>
     </section>
 
     <section class="container" id="feedback-list">
-        <!-- Feedback Cards will be dynamically loaded here -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature Title</th>
+                    <th>Description</th>
+                    <th>Votes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="feedback-table-body">
+                <!-- Feedback rows will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h3>Product Backlog</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature Title</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="product-backlog-body">
+                <!-- Product backlog rows will appear here -->
+            </tbody>
+        </table>
     </section>
 
     <footer>
-        <p>&copy; 2024 Idea Backlog. All Rights Reserved.</p>
+        <p>&copy; 2025 Idea Backlog. All Rights Reserved.</p>
     </footer>
 
     <script>
@@ -35,26 +62,28 @@
             { id: 3, title: "Faster Loading Times", description: "The app should load faster for a smoother user experience.", votes: 0 }
         ];
 
+        const productBacklog = [];
+
         // Function to render feedback
         function renderFeedback() {
-            const feedbackList = document.getElementById('feedback-list');
-            feedbackList.innerHTML = ''; // Clear existing feedback list
+            const feedbackTableBody = document.getElementById('feedback-table-body');
+            feedbackTableBody.innerHTML = ''; // Clear existing feedback list
 
             feedbacks.forEach(feedback => {
-                const feedbackCard = document.createElement('div');
-                feedbackCard.classList.add('card');
+                const row = document.createElement('tr');
 
-                feedbackCard.innerHTML = `
-                    <h3>${feedback.title}</h3>
-                    <p>${feedback.description}</p>
-                    <div class="vote-buttons">
-                        <button class="upvote" onclick="vote(${feedback.id}, 'up')">Upvote</button>
-                        <button class="downvote" onclick="vote(${feedback.id}, 'down')">Downvote</button>
-                        <span>Votes: <span id="votes-${feedback.id}">${feedback.votes}</span></span>
-                    </div>
+                row.innerHTML = `
+                    <td>${feedback.title}</td>
+                    <td>${feedback.description}</td>
+                    <td id="votes-${feedback.id}">${feedback.votes}</td>
+                    <td>
+                        <button onclick="vote(${feedback.id}, 'up')">Upvote</button>
+                        <button onclick="vote(${feedback.id}, 'down')">Downvote</button>
+                        <button onclick="moveToProductBacklog(${feedback.id})">Move to Product Backlog</button>
+                    </td>
                 `;
 
-                feedbackList.appendChild(feedbackCard);
+                feedbackTableBody.appendChild(row);
             });
         }
 
@@ -69,6 +98,34 @@
 
             // Update the vote count on the page
             document.getElementById(`votes-${feedback.id}`).innerText = feedback.votes;
+        }
+
+        // Move feature to product backlog
+        function moveToProductBacklog(feedbackId) {
+            const feedbackIndex = feedbacks.findIndex(f => f.id === feedbackId);
+            if (feedbackIndex !== -1) {
+                const [movedFeature] = feedbacks.splice(feedbackIndex, 1);
+                productBacklog.push(movedFeature);
+                renderFeedback();
+                renderProductBacklog();
+            }
+        }
+
+        // Render product backlog
+        function renderProductBacklog() {
+            const productBacklogBody = document.getElementById('product-backlog-body');
+            productBacklogBody.innerHTML = '';
+
+            productBacklog.forEach(feature => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${feature.title}</td>
+                    <td>${feature.description}</td>
+                `;
+
+                productBacklogBody.appendChild(row);
+            });
         }
 
         // Initial render of feedbacks
