@@ -3,89 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint Management</title>
+    <title>Sprint Backlog</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Sprint Management</h1>
+        <h1>Sprint Backlog</h1>
         <nav>
             <a href="landing.html">Back to Features</a>
+            <a href="idea.html">View Idea Backlog</a>
+            <a href="product.html">View Product Backlog</a>
         </nav>
     </header>
+
     <section>
-        <h2>Plan sprints with start/end dates, story points, and assigned team members.</h2>
-        <p>This page will help you with sprint planning and tracking progress.</p>
-
-        <form id="sprint-form">
-            <h3>Create New Sprint</h3>
-            <label for="sprint-name">Sprint Name:</label>
-            <input type="text" id="sprint-name" name="sprintName" required><br><br>
-
-            <h4>User Stories</h4>
-            <div class="table-container">
-                <table border="1" id="user-stories-table">
-                    <thead>
-                        <tr>
-                            <th>Feature</th>
-                            <th>User Story</th>
-                            <th>Acceptance Criteria</th>
-                            <th>Story Type</th>
-                            <th>Story Points</th>
-                            <th>Developer</th>
-                            <th>Tech Stack</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="text" name="feature[]" required></td>
-                            <td><textarea name="userStory[]" rows="3" required></textarea></td>
-                            <td><textarea name="acceptanceCriteria[]" rows="3" required></textarea></td>
-                            <td>
-                                <select name="storyType[]" required>
-                                    <option value="feature">Feature</option>
-                                    <option value="bug">Bug</option>
-                                    <option value="task">Task</option>
-                                    <option value="enhancement">Enhancement</option>
-                                    <option value="infrastructure">Infrastructure Improvement</option>
-                                </select>
-                            </td>
-                            <td><input type="number" name="storyPoints[]" min="1" required></td>
-                            <td>
-                                <select name="assignedDeveloper[]" required>
-                                    <option value="Said">Said</option>
-                                    <option value="Grace">Grace</option>
-                                    <option value="Herman">Herman</option>
-                                    <option value="Stanley">Stanley</option>
-                                    <option value="Kisavi">Kisavi</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="techStack[]" required>
-                                    <option value="frontend">Frontend</option>
-                                    <option value="backend">Backend</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select name="status[]" required>
-                                    <option value="incomplete">Incomplete</option>
-                                    <option value="done">Done</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button type="button" class="save-button">Save</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <button type="submit">Create Sprint</button>
-        </form>
+        <h2>Current Sprint Backlog</h2>
+        <p>This page displays the features selected for the current sprint, along with relevant details for implementation.</p>
     </section>
 
-    <script src="scripts.js"></script>
+    <section class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>User Acceptance</th>
+                    <th>Tech Assigned</th>
+                    <th>Tech Stack</th>
+                    <th>Story Points</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="sprint-backlog-body">
+                <!-- Sprint backlog items will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Sprint Backlog. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Load sprint backlog from localStorage
+        function renderSprintBacklog() {
+            const sprintBacklogBody = document.getElementById('sprint-backlog-body');
+            const sprintBacklog = JSON.parse(localStorage.getItem('sprintBacklog')) || [];
+
+            sprintBacklogBody.innerHTML = ''; // Clear existing rows
+
+            sprintBacklog.forEach((item, index) => {
+                const backlogRow = document.createElement('tr');
+
+                backlogRow.innerHTML = `
+                    <td>${item.title}</td>
+                    <td>${item.description}</td>
+                    <td><input type="text" placeholder="Enter user acceptance criteria" /></td>
+                    <td><input type="text" placeholder="Assign technician" /></td>
+                    <td>
+                        <select>
+                            <option value="Front End">Front End</option>
+                            <option value="Back End">Back End</option>
+                        </select>
+                    </td>
+                    <td><input type="number" min="1" placeholder="Story Points" /></td>
+                    <td>
+                        <select>
+                            <option value="Incomplete">Incomplete</option>
+                            <option value="Done">Done</option>
+                        </select>
+                    </td>
+                `;
+
+                sprintBacklogBody.appendChild(backlogRow);
+            });
+        }
+
+        // Initial render of sprint backlog
+        renderSprintBacklog();
+    </script>
 </body>
 </html>
