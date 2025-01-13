@@ -11,6 +11,7 @@
         <h1>Idea Backlog</h1>
         <nav>
             <a href="landing.html">Back to Features</a>
+            <a href="product.html">View Product Backlog</a>
         </nav>
     </header>
 
@@ -23,29 +24,14 @@
         <table>
             <thead>
                 <tr>
-                    <th>Feature Title</th>
+                    <th>Title</th>
                     <th>Description</th>
                     <th>Votes</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="feedback-table-body">
-                <!-- Feedback rows will be dynamically loaded here -->
-            </tbody>
-        </table>
-    </section>
-
-    <section>
-        <h3>Product Backlog</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Feature Title</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody id="product-backlog-body">
-                <!-- Product backlog rows will appear here -->
+                <!-- Feedback Rows will be dynamically loaded here -->
             </tbody>
         </table>
     </section>
@@ -62,31 +48,6 @@
             { id: 3, title: "Faster Loading Times", description: "The app should load faster for a smoother user experience.", votes: 0 }
         ];
 
-        const productBacklog = [];
-
-        // Function to render feedback
-        function renderFeedback() {
-            const feedbackTableBody = document.getElementById('feedback-table-body');
-            feedbackTableBody.innerHTML = ''; // Clear existing feedback list
-
-            feedbacks.forEach(feedback => {
-                const row = document.createElement('tr');
-
-                row.innerHTML = `
-                    <td>${feedback.title}</td>
-                    <td>${feedback.description}</td>
-                    <td id="votes-${feedback.id}">${feedback.votes}</td>
-                    <td>
-                        <button onclick="vote(${feedback.id}, 'up')">Upvote</button>
-                        <button onclick="vote(${feedback.id}, 'down')">Downvote</button>
-                        <button onclick="moveToProductBacklog(${feedback.id})">Move to Product Backlog</button>
-                    </td>
-                `;
-
-                feedbackTableBody.appendChild(row);
-            });
-        }
-
         // Voting function
         function vote(feedbackId, type) {
             const feedback = feedbacks.find(f => f.id === feedbackId);
@@ -100,31 +61,41 @@
             document.getElementById(`votes-${feedback.id}`).innerText = feedback.votes;
         }
 
-        // Move feature to product backlog
-        function moveToProductBacklog(feedbackId) {
+        // Move feedback to product backlog (handled via localStorage for demonstration)
+        function moveToBacklog(feedbackId) {
             const feedbackIndex = feedbacks.findIndex(f => f.id === feedbackId);
             if (feedbackIndex !== -1) {
-                const [movedFeature] = feedbacks.splice(feedbackIndex, 1);
-                productBacklog.push(movedFeature);
+                const feedback = feedbacks.splice(feedbackIndex, 1)[0];
+
+                // Retrieve existing backlog from localStorage or initialize a new array
+                const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
+                productBacklog.push(feedback);
+                localStorage.setItem('productBacklog', JSON.stringify(productBacklog));
+
                 renderFeedback();
-                renderProductBacklog();
             }
         }
 
-        // Render product backlog
-        function renderProductBacklog() {
-            const productBacklogBody = document.getElementById('product-backlog-body');
-            productBacklogBody.innerHTML = '';
+        // Function to render feedback table
+        function renderFeedback() {
+            const feedbackTableBody = document.getElementById('feedback-table-body');
+            feedbackTableBody.innerHTML = ''; // Clear existing feedback rows
 
-            productBacklog.forEach(feature => {
-                const row = document.createElement('tr');
+            feedbacks.forEach(feedback => {
+                const feedbackRow = document.createElement('tr');
 
-                row.innerHTML = `
-                    <td>${feature.title}</td>
-                    <td>${feature.description}</td>
+                feedbackRow.innerHTML = `
+                    <td>${feedback.title}</td>
+                    <td>${feedback.description}</td>
+                    <td id="votes-${feedback.id}">${feedback.votes}</td>
+                    <td>
+                        <button onclick="vote(${feedback.id}, 'up')">Upvote</button>
+                        <button onclick="vote(${feedback.id}, 'down')">Downvote</button>
+                        <button onclick="moveToBacklog(${feedback.id})">Move to Product Backlog</button>
+                    </td>
                 `;
 
-                productBacklogBody.appendChild(row);
+                feedbackTableBody.appendChild(feedbackRow);
             });
         }
 
