@@ -10,15 +10,17 @@
     <header>
         <h1>Product Backlog</h1>
         <nav>
-            <a href="landing.html">Back to Features</a>
+            <a href="landing.html">Home</a>
             <a href="idea.html">View Idea Backlog</a>
-            <a href="sprint.html">View Sprint Backlog</a>
+            <a href="product.html">View Product Backlog</a>
+            <a href="sprint.html">View Sprint</a>
+
         </nav>
     </header>
 
     <section>
-        <h2>Features promoted to the product backlog.</h2>
-        <p>This page displays features that have been moved from the idea backlog and are now ready for consideration in development.</p>
+        <h2>Manage prioritized features in the product backlog.</h2>
+        <p>Features moved here from the idea backlog can be prepared for sprints.</p>
     </section>
 
     <section class="container">
@@ -30,8 +32,8 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="product-backlog-body">
-                <!-- Product backlog items will be dynamically loaded here -->
+            <tbody id="product-backlog-table-body">
+                <!-- Product Backlog Rows will be dynamically loaded here -->
             </tbody>
         </table>
     </section>
@@ -41,44 +43,50 @@
     </footer>
 
     <script>
-        // Load product backlog from localStorage
+        // Function to render the product backlog
         function renderProductBacklog() {
-            const productBacklogBody = document.getElementById('product-backlog-body');
             const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
+            const productTableBody = document.getElementById('product-backlog-table-body');
 
-            productBacklogBody.innerHTML = ''; // Clear existing rows
+            productTableBody.innerHTML = ''; // Clear existing content
 
             productBacklog.forEach((item, index) => {
-                const backlogRow = document.createElement('tr');
-
-                backlogRow.innerHTML = `
+                const row = document.createElement('tr');
+                row.innerHTML = `
                     <td>${item.title}</td>
                     <td>${item.description}</td>
-                    <td><button onclick="moveToSprint(${index})">Move to Sprint Backlog</button></td>
+                    <td>
+                        <button onclick="promoteToSprint(${index})">Promote to Sprint</button>
+                    </td>
                 `;
-
-                productBacklogBody.appendChild(backlogRow);
+                productTableBody.appendChild(row);
             });
         }
 
-        // Move feature to sprint backlog
-        function moveToSprint(index) {
+        // Function to promote a feature to the sprint backlog
+        function promoteToSprint(index) {
             const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
             const sprintBacklog = JSON.parse(localStorage.getItem('sprintBacklog')) || [];
 
-            if (productBacklog[index]) {
-                sprintBacklog.push(productBacklog[index]);
-                productBacklog.splice(index, 1);
+            const [promotedItem] = productBacklog.splice(index, 1);
+            sprintBacklog.push({
+                ...promotedItem,
+                userStory: '',
+                techStack: 'Front End', // Default
+                acceptanceCriteria: '',
+                userStoryType: '',
+                assignee: 'Unassigned',
+                status: 'Incomplete' // Default
+            });
 
-                localStorage.setItem('productBacklog', JSON.stringify(productBacklog));
-                localStorage.setItem('sprintBacklog', JSON.stringify(sprintBacklog));
-
-                renderProductBacklog();
-            }
+            localStorage.setItem('productBacklog', JSON.stringify(productBacklog));
+            localStorage.setItem('sprintBacklog', JSON.stringify(sprintBacklog));
+            renderProductBacklog();
+            alert(`${promotedItem.title} has been moved to the Sprint Backlog.`);
         }
 
-        // Initial render of product backlog
-        renderProductBacklog();
+        // Render the product backlog on page load
+        document.addEventListener('DOMContentLoaded', renderProductBacklog);
     </script>
 </body>
 </html>
