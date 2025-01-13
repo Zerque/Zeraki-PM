@@ -10,8 +10,10 @@
     <header>
         <h1>Idea Backlog</h1>
         <nav>
-            <a href="landing.html">Back to Features</a>
+            <a href="landing.html">Home</a>
+            <a href="idea.html">View Idea Backlog</a>
             <a href="product.html">View Product Backlog</a>
+            <a href="sprint.html">View Sprint</a>
         </nav>
     </header>
 
@@ -20,7 +22,7 @@
         <p>This page will display collected feedback from users. Vote on ideas to move them forward.</p>
     </section>
 
-    <section class="container" id="feedback-list">
+    <section class="container">
         <table>
             <thead>
                 <tr>
@@ -30,7 +32,7 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="feedback-table-body">
+            <tbody id="idea-backlog-table-body">
                 <!-- Feedback Rows will be dynamically loaded here -->
             </tbody>
         </table>
@@ -41,66 +43,58 @@
     </footer>
 
     <script>
-        // Sample feedback data (this would normally come from the backend)
-        const feedbacks = [
-            { id: 1, title: "Improve Search Functionality", description: "Users need better filtering options.", votes: 0 },
-            { id: 2, title: "Add Dark Mode", description: "A dark mode option for the website is requested.", votes: 0 },
-            { id: 3, title: "Faster Loading Times", description: "The app should load faster for a smoother user experience.", votes: 0 }
-        ];
+        // Function to render the idea backlog
+        function renderIdeaBacklog() {
+            const ideaBacklog = JSON.parse(localStorage.getItem('ideaBacklog')) || [];
+            const ideaTableBody = document.getElementById('idea-backlog-table-body');
 
-        // Voting function
-        function vote(feedbackId, type) {
-            const feedback = feedbacks.find(f => f.id === feedbackId);
-            if (type === 'up') {
-                feedback.votes++;
-            } else if (type === 'down') {
-                feedback.votes--;
-            }
+            ideaTableBody.innerHTML = ''; // Clear existing content
 
-            // Update the vote count on the page
-            document.getElementById(`votes-${feedback.id}`).innerText = feedback.votes;
-        }
-
-        // Move feedback to product backlog (handled via localStorage for demonstration)
-        function moveToBacklog(feedbackId) {
-            const feedbackIndex = feedbacks.findIndex(f => f.id === feedbackId);
-            if (feedbackIndex !== -1) {
-                const feedback = feedbacks.splice(feedbackIndex, 1)[0];
-
-                // Retrieve existing backlog from localStorage or initialize a new array
-                const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
-                productBacklog.push(feedback);
-                localStorage.setItem('productBacklog', JSON.stringify(productBacklog));
-
-                renderFeedback();
-            }
-        }
-
-        // Function to render feedback table
-        function renderFeedback() {
-            const feedbackTableBody = document.getElementById('feedback-table-body');
-            feedbackTableBody.innerHTML = ''; // Clear existing feedback rows
-
-            feedbacks.forEach(feedback => {
-                const feedbackRow = document.createElement('tr');
-
-                feedbackRow.innerHTML = `
-                    <td>${feedback.title}</td>
-                    <td>${feedback.description}</td>
-                    <td id="votes-${feedback.id}">${feedback.votes}</td>
+            ideaBacklog.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.title}</td>
+                    <td>${item.description}</td>
+                    <td id="votes-${index}">${item.votes || 0}</td>
                     <td>
-                        <button onclick="vote(${feedback.id}, 'up')">Upvote</button>
-                        <button onclick="vote(${feedback.id}, 'down')">Downvote</button>
-                        <button onclick="moveToBacklog(${feedback.id})">Move to Product Backlog</button>
+                        <button onclick="vote(${index}, 'up')">Upvote</button>
+                        <button onclick="vote(${index}, 'down')">Downvote</button>
+                        <button onclick="promoteToProductBacklog(${index})">Promote to Product Backlog</button>
                     </td>
                 `;
-
-                feedbackTableBody.appendChild(feedbackRow);
+                ideaTableBody.appendChild(row);
             });
         }
 
-        // Initial render of feedbacks
-        renderFeedback();
+        // Voting functionality
+        function vote(index, type) {
+            const ideaBacklog = JSON.parse(localStorage.getItem('ideaBacklog')) || [];
+            if (type === 'up') {
+                ideaBacklog[index].votes = (ideaBacklog[index].votes || 0) + 1;
+            } else if (type === 'down') {
+                ideaBacklog[index].votes = (ideaBacklog[index].votes || 0) - 1;
+            }
+            localStorage.setItem('ideaBacklog', JSON.stringify(ideaBacklog));
+            renderIdeaBacklog();
+        }
+
+        // Promote idea to product backlog
+        function promoteToProductBacklog(index) {
+            const ideaBacklog = JSON.parse(localStorage.getItem('ideaBacklog')) || [];
+            const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
+
+            const [promotedItem] = ideaBacklog.splice(index, 1);
+            productBacklog.push(promotedItem);
+
+            localStorage.setItem('ideaBacklog', JSON.stringify(ideaBacklog));
+            localStorage.setItem('productBacklog', JSON.stringify(productBacklog));
+            renderIdeaBacklog();
+            alert(`${promotedItem.title} has been moved to the Product Backlog.`);
+            window.location.href = 'product.html'; // Redirect to the Product Backlog page
+        }
+
+        // Render the idea backlog on page load
+        document.addEventListener('DOMContentLoaded', renderIdeaBacklog);
     </script>
 </body>
 </html>
