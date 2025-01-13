@@ -6,40 +6,38 @@
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   line-height: 1.6;
   color: #333;
   background-color: #f4f4f4;
 }
 
+/* Header Styling */
 header {
   background: #5fb664; /* Xeraki Green */
   color: #fff;
-  padding: 20px 0;
+  padding: 20px;
   text-align: center;
 }
 
 header h1 {
   font-size: 2.5em;
-}
-
-header p {
-  margin-top: 10px;
-  font-size: 1.2em;
+  margin: 0;
 }
 
 nav {
   display: flex;
   justify-content: center;
-  background: #e1f2f9; /* Sky Blue */
+  background: #87ceeb; /* Sky Blue */
   padding: 10px 0;
 }
 
 nav a {
   color: #fff;
   text-decoration: none;
-  padding: 10px 20px;
-  margin: 0 10px;
+  margin: 0 15px;
+  padding: 10px;
+  font-weight: bold;
   transition: background 0.3s;
 }
 
@@ -48,37 +46,47 @@ nav a:hover {
   border-radius: 5px;
 }
 
+/* Section Styling */
 section {
   padding: 20px;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
+h2 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Card and Container Styling */
 .container {
   display: flex;
   flex-wrap: wrap;
+  gap: 20px;
   justify-content: center;
 }
 
 .card {
   background: #fff;
-  margin: 10px;
-  padding: 20px;
-  width: 300px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
   text-align: center;
+  width: 300px;
 }
 
 .card h3 {
+  color: #5fb664;
   font-size: 1.5em;
-  color: #5fb664; /* Xeraki Green */
 }
 
 .card p {
-  font-size: 1em;
   margin: 10px 0;
+  font-size: 1em;
 }
 
 .btn {
@@ -92,119 +100,226 @@ section {
 }
 
 .btn:hover {
-  background: #e1f2f9; /* Sky Blue */
+  background: #87ceeb; /* Sky Blue */
 }
 
+/* Footer Styling */
 footer {
   background: #333;
   color: #fff;
   text-align: center;
-  padding: 10px 0;
+  padding: 10px;
   margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-  .card {
-    width: 90%;
-  }
+  border-radius: 0 0 8px 8px;
 }
 
 /* Table Styling */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px auto;
-  background-color: #e8f5e9; /* Light Xeraki Green */
+  margin: 20px 0;
+  background: #e8f5e9; /* Light Xeraki Green */
+  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 thead th {
-  background-color: #87ceeb; /* Sky Blue */
+  background: #5fb664; /* Xeraki Green */
   color: #fff;
   padding: 10px;
   text-align: left;
 }
 
 tbody td {
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ddd;
   text-align: left;
 }
 
 tr:nth-child(even) {
-  background-color: #c8e6c9; /* Xeraki Green Lighter */
+  background: #c8e6c9; /* Lighter Xeraki Green */
 }
 
 tr:hover {
-  background-color: #a5d6a7; /* Xeraki Green Darker */
+  background: #a5d6a7; /* Darker Xeraki Green */
 }
 
-/* Login Container */
-.login-container {
+/* Scrollable Sprint Table */
+.sprint-container {
+  max-height: 400px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.sprint-container table {
   width: 100%;
-  max-width: 500px;
-  margin: auto;
+}
+
+.sprint-container thead th {
+  position: static;
+  top: 0;
+  background: #4CAF50; /* Green */
+  color: #fff;
+  z-index: 1;
+}
+
+/* Input and Form Styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  font-weight: bold;
+  color: #555;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #5fb664;
+}
+
+textarea {
+  resize: vertical;
+  height: 80px;
+}
+
+/* Dialog Box Styling */
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
   padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  z-index: 1000;
+  width: 300px;
+}
+
+.dialog p {
+  margin: 0 0 20px;
   text-align: center;
 }
 
-/* Login Card */
-.login-card {
-  padding: 20px;
-}
-
-/* Logo Styling */
-.logo {
-  width: 120px;
-  margin-bottom: 10px;
-}
-
-/* Header Styling */
-.login-header h2 {
-  font-size: 24px;
-  color: #5fb664; /* Xeraki Green */
-  margin: 10px 0;
-}
-
-.login-header p {
-  font-size: 14px;
-  color: #666;
-  margin: 0;
-}
-
-/* Input Field */
-.input-field {
-  width: 100%;
-  padding: 10px;
-  margin: 15px 0;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
-/* Login Button */
-.login-button {
-  background-color: #5fb664; /* Xeraki Green */
-  color: white;
-  font-size: 16px;
-  padding: 10px 15px;
+.dialog button {
+  background: #5fb664; /* Xeraki Green */
+  color: #fff;
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
+  font-size: 16px;
   cursor: pointer;
-  width: 100%;
 }
 
-.login-button:hover {
+.dialog button:hover {
+  background: #87ceeb; /* Sky Blue */
+}
+
+.dialog.hidden {
+  display: none;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .card {
+    width: 90%;
+  }
+}
+
+/* General Button Styling */
+button {
+  background-color: #5fb664; /* Xeraki Green */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover Effect */
+button:hover {
   background-color: #87ceeb; /* Sky Blue */
+  color: #fff;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px); /* Slight lift effect */
 }
 
-/* Error Message */
-.error-message {
-  color: red;
+/* Focus Effect */
+button:focus {
+  outline: none;
+  box-shadow: 0 0 4px 2px rgba(95, 182, 100, 0.8); /* Green focus ring */
+}
+
+/* Disabled Button */
+button:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Small Button */
+button.small {
+  padding: 5px 10px;
   font-size: 14px;
-  margin-top: 10px;
+}
+
+/* Large Button */
+button.large {
+  padding: 15px 20px;
+  font-size: 18px;
+}
+
+/* Primary Button */
+button.primary {
+  background-color: #4CAF50; /* Bright Green */
+  color: white;
+}
+
+/* Danger Button */
+button.danger {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+button.danger:hover {
+  background-color: #d32f2f; /* Darker Red */
+}
+
+/* Outline Button */
+button.outline {
+  background-color: transparent;
+  border: 2px solid #5fb664; /* Xeraki Green */
+  color: #5fb664;
+}
+
+button.outline:hover {
+  background-color: #5fb664;
+  color: white;
+}
+
+/* Full-Width Button */
+button.full-width {
+  width: 100%;
 }
