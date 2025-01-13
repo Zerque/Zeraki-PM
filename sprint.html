@@ -10,32 +10,35 @@
     <header>
         <h1>Sprint Backlog</h1>
         <nav>
-            <a href="landing.html">Back to Features</a>
+            <a href="landing.html">Home</a>
             <a href="idea.html">View Idea Backlog</a>
             <a href="product.html">View Product Backlog</a>
+            <a href="sprint.html">View Sprint</a>
         </nav>
     </header>
 
     <section>
-        <h2>Current Sprint Backlog</h2>
-        <p>This page displays the features selected for the current sprint, along with relevant details for implementation.</p>
+        <h2>Manage Sprint Backlog</h2>
+        <p>Update details for each feature and track their progress.</p>
     </section>
 
-    <section class="container">
+    <section class="sprint-container">
         <table>
             <thead>
                 <tr>
                     <th>Title</th>
                     <th>Description</th>
-                    <th>User Acceptance</th>
-                    <th>Tech Assigned</th>
+                    <th>User Story</th>
                     <th>Tech Stack</th>
-                    <th>Story Points</th>
+                    <th>Acceptance Criteria</th>
+                    <th>User Story Type</th>
+                    <th>Assignee</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="sprint-backlog-body">
-                <!-- Sprint backlog items will be dynamically loaded here -->
+            <tbody id="sprint-backlog-table-body">
+                <!-- Sprint Backlog Rows will be dynamically loaded here -->
             </tbody>
         </table>
     </section>
@@ -45,42 +48,77 @@
     </footer>
 
     <script>
-        // Load sprint backlog from localStorage
+        // Render the Sprint Backlog
         function renderSprintBacklog() {
-            const sprintBacklogBody = document.getElementById('sprint-backlog-body');
             const sprintBacklog = JSON.parse(localStorage.getItem('sprintBacklog')) || [];
+            const sprintTableBody = document.getElementById('sprint-backlog-table-body');
 
-            sprintBacklogBody.innerHTML = ''; // Clear existing rows
+            sprintTableBody.innerHTML = ''; // Clear existing rows
 
             sprintBacklog.forEach((item, index) => {
-                const backlogRow = document.createElement('tr');
-
-                backlogRow.innerHTML = `
+                const row = document.createElement('tr');
+                row.innerHTML = `
                     <td>${item.title}</td>
                     <td>${item.description}</td>
-                    <td><input type="text" placeholder="Enter user acceptance criteria" /></td>
-                    <td><input type="text" placeholder="Assign technician" /></td>
+                    <td><textarea onchange="updateSprintField(${index}, 'userStory', this.value)">${item.userStory || ''}</textarea></td>
                     <td>
-                        <select>
-                            <option value="Front End">Front End</option>
-                            <option value="Back End">Back End</option>
+                        <select onchange="updateSprintField(${index}, 'techStack', this.value)">
+                            <option value="Front End" ${item.techStack === 'Front End' ? 'selected' : ''}>Front End</option>
+                            <option value="Back End" ${item.techStack === 'Back End' ? 'selected' : ''}>Back End</option>
                         </select>
                     </td>
-                    <td><input type="number" min="1" placeholder="Story Points" /></td>
+                    <td><textarea onchange="updateSprintField(${index}, 'acceptanceCriteria', this.value)">${item.acceptanceCriteria || ''}</textarea></td>
+                    <td><textarea onchange="updateSprintField(${index}, 'userStoryType', this.value)">${item.userStoryType || ''}</textarea></td>
                     <td>
-                        <select>
-                            <option value="Incomplete">Incomplete</option>
-                            <option value="Done">Done</option>
+                        <select onchange="updateSprintField(${index}, 'assignee', this.value)">
+                            <option value="Grace" ${item.assignee === 'Grace' ? 'selected' : ''}>Grace</option>
+                            <option value="Stanley" ${item.assignee === 'Stanley' ? 'selected' : ''}>Stanley</option>
+                            <option value="Kisavi" ${item.assignee === 'Kisavi' ? 'selected' : ''}>Kisavi</option>
+                            <option value="Sielei" ${item.assignee === 'Sielei' ? 'selected' : ''}>Sielei</option>
+                            <option value="Said" ${item.assignee === 'Said' ? 'selected' : ''}>Said</option>
                         </select>
+                    </td>
+                    <td>
+                        <select onchange="updateSprintField(${index}, 'status', this.value)">
+                            <option value="Incomplete" ${item.status === 'Incomplete' ? 'selected' : ''}>Incomplete</option>
+                            <option value="Done" ${item.status === 'Done' ? 'selected' : ''}>Done</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn primary" onclick="saveSprintItem(${index})">Save</button>
+                        <button class="btn danger" onclick="deleteSprintItem(${index})">Delete</button>
                     </td>
                 `;
-
-                sprintBacklogBody.appendChild(backlogRow);
+                sprintTableBody.appendChild(row);
             });
         }
 
-        // Initial render of sprint backlog
-        renderSprintBacklog();
+        // Update fields in Sprint Backlog
+        function updateSprintField(index, field, value) {
+            const sprintBacklog = JSON.parse(localStorage.getItem('sprintBacklog')) || [];
+            sprintBacklog[index][field] = value;
+            localStorage.setItem('sprintBacklog', JSON.stringify(sprintBacklog));
+        }
+
+        // Save a single Sprint Item
+        function saveSprintItem(index) {
+            const sprintBacklog = JSON.parse(localStorage.getItem('sprintBacklog')) || [];
+            const item = sprintBacklog[index];
+            localStorage.setItem('sprintBacklog', JSON.stringify(sprintBacklog));
+            alert(`Feature "${item.title}" has been saved successfully!`);
+        }
+
+        // Delete a Sprint Item
+        function deleteSprintItem(index) {
+            const sprintBacklog = JSON.parse(localStorage.getItem('sprintBacklog')) || [];
+            const [deletedItem] = sprintBacklog.splice(index, 1);
+            localStorage.setItem('sprintBacklog', JSON.stringify(sprintBacklog));
+            renderSprintBacklog();
+            alert(`Feature "${deletedItem.title}" has been deleted.`);
+        }
+
+        // Render Sprint Backlog on Page Load
+        document.addEventListener('DOMContentLoaded', renderSprintBacklog);
     </script>
 </body>
 </html>
