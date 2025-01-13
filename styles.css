@@ -122,13 +122,13 @@ thead th {
   background-color: #87ceeb; /* Sky Blue */
   color: #fff;
   padding: 10px;
-  text-align: center;
+  text-align: left;
 }
 
 tbody td {
   padding: 8px;
   border: 1px solid #ddd;
-  text-align: center;
+  text-align: left;
 }
 
 tr:nth-child(even) {
