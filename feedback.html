@@ -3,28 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback</title>
-<head>
-    <link rel="stylesheet" href="styles.css">
     <title>Feedback Management</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
         <h1>Feedback Management</h1>
         <nav>
-            <a href="landing.html">Back to Features</a>
+            <a href="landing.html">Home</a>
+            <a href="idea.html">View Idea Backlog</a>
+            <a href="product.html">View Product Backlog</a>
+            <a href="sprint.html">View Sprint</a>
         </nav>
     </header>
     
     <section>
         <h2>Collect, organize, and prioritize user feedback effortlessly.</h2>
-        <p>This page will contain detailed information on how to manage feedback effectively.</p>
+        <p>Use this page to collect feedback and manage it effectively.</p>
         
-        <!-- Embed Google Form -->
-        <div class="form-container" style="max-width: 900px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdJFPHIwD8NzK_lER85rT3CdhwrJzTt0-IPat6EszjDv2aSaA/viewform?embedded=true" width="940" height="515" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+        <!-- Add Feedback Form -->
+        <div class="form-container">
+            <h3>Add Feedback</h3>
+            <form id="add-feedback-form">
+                <label for="feature-title">Feature Title:</label>
+                <input type="text" id="feature-title" name="feature-title" placeholder="Enter feature title" required>
+
+                <label for="feature-description">Feature Description:</label>
+                <textarea id="feature-description" name="feature-description" placeholder="Enter feature description" required></textarea>
+
+                <button type="submit">Add Feedback</button>
+            </form>
+        </div>
+
+        <!-- Feedback Table -->
+        <div class="feedback-table">
+            <h3>Feedback Table</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="feedback-table-body">
+                    <!-- Feedback items will be dynamically added here -->
+                </tbody>
+            </table>
         </div>
     </section>
+
+    <!-- Dialog Box -->
+    <div id="dialog-box" class="dialog hidden"></div>
+
+    <footer>
+        <p>&copy; 2025 Feedback Management. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Handle Add Feedback Form Submission
+        document.getElementById('add-feedback-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const title = document.getElementById('feature-title').value.trim();
+            const description = document.getElementById('feature-description').value.trim();
+
+            if (title && description) {
+                addFeedback(title, description);
+                this.reset();
+            } else {
+                alert('Please fill in both the title and description.');
+            }
+        });
+    </script>
+
 </body>
 </html>
-
