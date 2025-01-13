@@ -1,307 +1,142 @@
-const xlsx = require('xlsx');
-const fs = require('fs');
+// Function to render the feedback table
+function renderFeedbackTable() {
+    const feedbackTable = JSON.parse(localStorage.getItem('feedbackTable')) || [];
+    const feedbackTableBody = document.getElementById('feedback-table-body');
 
-// Read Excel file
-const workbook = xlsx.readFile('feedbacks.xlsx');
+    feedbackTableBody.innerHTML = ''; // Clear previous content
 
-// Get the first sheet
-const sheet_name_list = workbook.SheetNames;
-const feedbackSheet = workbook.Sheets[sheet_name_list[0]];
-
-// Convert sheet to JSON
-const feedbackData = xlsx.utils.sheet_to_json(feedbackSheet);
-
-// Save as JSON file (or import to a database)
-fs.writeFileSync('feedbackData.json', JSON.stringify(feedbackData, null, 2));
-
-console.log("Feedback Data Imported Successfully!");
-
-<script>
-    // Fetch feedback data from backend API
-    async function fetchFeedback() {
-        try {
-            const response = await fetch('http://localhost:3000/api/feedback');
-            const feedbacks = await response.json();
-            
-            // Render the feedback on the page
-            renderFeedback(feedbacks);
-        } catch (error) {
-            console.error('Error fetching feedback:', error);
-        }
-    }
-
-    // Function to render feedback
-    function renderFeedback(feedbacks) {
-        const feedbackList = document.getElementById('feedback-list');
-        feedbackList.innerHTML = ''; // Clear existing feedback list
-
-        feedbacks.forEach(feedback => {
-            const feedbackCard = document.createElement('div');
-            feedbackCard.classList.add('card');
-
-            feedbackCard.innerHTML = `
-                <h3>${feedback.Title}</h3>
-                <p>${feedback.Description}</p>
-                <div class="vote-buttons">
-                    <button class="upvote" onclick="vote(${feedback.id}, 'up')">Upvote</button>
-                    <button class="downvote" onclick="vote(${feedback.id}, 'down')">Downvote</button>
-                    <span>Votes: <span id="votes-${feedback.id}">${feedback.Votes}</span></span>
-                </div>
-            `;
-
-            feedbackList.appendChild(feedbackCard);
-        });
-    }
-
-    // Voting function (calls backend to register vote)
-    async function vote(feedbackId, type) {
-        try {
-            const response = await fetch('http://localhost:3000/api/vote', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ feedbackId, type })
-            });
-            const data = await response.json();
-            console.log(data.message);
-
-            // For now, simulate vote update in the UI (no DB updates in this example)
-            const voteElement = document.getElementById(`votes-${feedbackId}`);
-            const currentVotes = parseInt(voteElement.innerText);
-            voteElement.innerText = currentVotes + (type === 'up' ? 1 : -1);
-        } catch (error) {
-            console.error('Error voting:', error);
-        }
-    }
-
-    // Initial fetch of feedback when page loads
-    fetchFeedback();
-</script>
-const express = require('express');
-const { google } = require('googleapis');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
-
-// Initialize express app
-const app = express();
-const port = 3000;
-
-// Enable CORS for frontend to access backend
-app.use(cors());
-
-// Middleware to parse JSON and url-encoded bodies
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// The Google Sheets API requires OAuth2, so we need to authenticate
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-const TOKEN_PATH = 'token.json';
-
-// Your Google Sheets ID (replace with your actual Sheet ID)
-const SPREADSHEET_ID = '1PaeTKXwOnRtfIKou432nlxIUXiA-c2YANYtjMENi0pA';
-
-// Authenticate and get the Google Sheets data
-async function authenticateGoogle() {
-    const credentials = JSON.parse(fs.readFileSync('credentials.json')); // Path to your credentials file
-
-    const { client_secret, client_id, redirect_uris } = credentials.installed;
-    const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-
-    // Check if we have a stored token
-    if (fs.existsSync(TOKEN_PATH)) {
-        const token = JSON.parse(fs.readFileSync(TOKEN_PATH));
-        oAuth2Client.setCredentials(token);
-        return oAuth2Client;
-    }
-
-    // If no token, get a new one
-    return getAccessToken(oAuth2Client);
-}
-
-// Get the access token for the first time authentication
-function getAccessToken(oAuth2Client) {
-    return new Promise((resolve, reject) => {
-        const authUrl = oAuth2Client.generateAuthUrl({
-            access_type: 'offline',
-            scope: SCOPES,
-        });
-        console.log('Authorize this app by visiting this url:', authUrl);
-
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        });
-
-        rl.question('Enter the code from that page here: ', (code) => {
-            rl.close();
-            oAuth2Client.getToken(code, (err, token) => {
-                if (err) {
-                    reject('Error while trying to retrieve access token');
-                } else {
-                    oAuth2Client.setCredentials(token);
-                    fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
-                    resolve(oAuth2Client);
-                }
-            });
-        });
+    feedbackTable.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.title}</td>
+            <td>${item.description}</td>
+            <td>
+                <button onclick="archiveFeedback(${index})">Archive</button>
+                <button onclick="moveToIdeaBacklog(${index})">Move to Idea Backlog</button>
+            </td>
+        `;
+        feedbackTableBody.appendChild(row);
     });
 }
 
-// Fetch feedback from the Google Sheet
-async function getFeedback() {
-    const authClient = await authenticateGoogle();
-    const sheets = google.sheets({ version: 'v4', auth: authClient });
-
-    const res = await sheets.spreadsheets.values.get({
-        spreadsheetId: SPREADSHEET_ID,
-        range: 'Sheet1!A2:C', // Adjust the range depending on your sheet layout
+// Add feedback to the table
+function addFeedback(title, description) {
+    const feedbackTable = JSON.parse(localStorage.getItem('feedbackTable')) || [];
+    feedbackTable.push({ title, description });
+    localStorage.setItem('feedbackTable', JSON.stringify(feedbackTable));
+    renderFeedbackTable();
+    showDialog('Feedback added successfully! Do you want to save it?', 'Save Feedback', () => {
+        saveFeedbackTable();
     });
-
-    // Format the response to a more user-friendly structure
-    const feedbacks = res.data.values.map(row => ({
-        title: row[0],
-        description: row[1],
-        votes: parseInt(row[2]) || 0, // Ensure the votes are parsed as integers
-    }));
-
-    return feedbacks;
 }
 
-// Define a route to get the feedback data
-app.get('/api/feedback', async (req, res) => {
-    try {
-        const feedbacks = await getFeedback();
-        res.json(feedbacks);
-    } catch (error) {
-        res.status(500).send('Error fetching feedback from Google Sheets');
-    }
-});
+// Archive feedback
+function archiveFeedback(index) {
+    const feedbackTable = JSON.parse(localStorage.getItem('feedbackTable')) || [];
+    const archiveBacklog = JSON.parse(localStorage.getItem('archiveBacklog')) || [];
 
-// Define the route to handle voting (Optional: store votes in a database)
-app.post('/api/vote', (req, res) => {
-    const { feedbackId, type } = req.body;
-    
-    // For simplicity, just send back a success message. 
-    // You can store the vote count in a database here.
-    res.json({
-        message: `Vote registered for feedback ${feedbackId}: ${type}`,
+    const [archivedItem] = feedbackTable.splice(index, 1);
+    archiveBacklog.push(archivedItem);
+
+    localStorage.setItem('feedbackTable', JSON.stringify(feedbackTable));
+    localStorage.setItem('archiveBacklog', JSON.stringify(archiveBacklog));
+    renderFeedbackTable();
+    showDialog(`${archivedItem.title} has been archived.`);
+}
+
+// Move feedback to idea backlog
+function moveToIdeaBacklog(index) {
+    const feedbackTable = JSON.parse(localStorage.getItem('feedbackTable')) || [];
+    const ideaBacklog = JSON.parse(localStorage.getItem('ideaBacklog')) || [];
+
+    const [movedItem] = feedbackTable.splice(index, 1);
+    ideaBacklog.push({ ...movedItem, votes: 0 });
+
+    localStorage.setItem('feedbackTable', JSON.stringify(feedbackTable));
+    localStorage.setItem('ideaBacklog', JSON.stringify(ideaBacklog));
+    renderFeedbackTable();
+    window.location.href = 'idea.html'; // Redirect to the Idea Backlog page
+}
+
+// Promote idea to product backlog
+function promoteToProductBacklog(index) {
+    const ideaBacklog = JSON.parse(localStorage.getItem('ideaBacklog')) || [];
+    const productBacklog = JSON.parse(localStorage.getItem('productBacklog')) || [];
+
+    const [promotedItem] = ideaBacklog.splice(index, 1);
+    productBacklog.push(promotedItem);
+
+    localStorage.setItem('ideaBacklog', JSON.stringify(ideaBacklog));
+    localStorage.setItem('productBacklog', JSON.stringify(productBacklog));
+    renderIdeaBacklog();
+    alert(`${promotedItem.title} has been moved to the Product Backlog.`);
+    window.location.href = 'product.html'; // Redirect to the Product Backlog page
+}
+
+// Save feedback table
+function saveFeedbackTable() {
+    const feedbackTable = JSON.parse(localStorage.getItem('feedbackTable')) || [];
+    localStorage.setItem('feedbackTable', JSON.stringify(feedbackTable));
+    showDialog('Feedback saved successfully!');
+}
+
+// Show a dialog box
+function showDialog(message, confirmText = 'OK', confirmCallback = null) {
+    const dialog = document.createElement('div');
+    dialog.style.position = 'fixed';
+    dialog.style.top = '50%';
+    dialog.style.left = '50%';
+    dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.padding = '20px';
+    dialog.style.backgroundColor = '#fff';
+    dialog.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    dialog.style.borderRadius = '8px';
+    dialog.style.zIndex = '1000';
+
+    const messageEl = document.createElement('p');
+    messageEl.textContent = message;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'center';
+    buttonContainer.style.gap = '10px';
+
+    const confirmButton = document.createElement('button');
+    confirmButton.textContent = confirmText;
+    confirmButton.style.backgroundColor = '#4CAF50';
+    confirmButton.style.color = '#fff';
+    confirmButton.style.border = 'none';
+    confirmButton.style.padding = '10px 20px';
+    confirmButton.style.borderRadius = '5px';
+    confirmButton.style.cursor = 'pointer';
+    confirmButton.addEventListener('click', () => {
+        dialog.remove();
+        if (confirmCallback) confirmCallback();
     });
+
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'Cancel';
+    cancelButton.style.backgroundColor = '#f44336';
+    cancelButton.style.color = '#fff';
+    cancelButton.style.border = 'none';
+    cancelButton.style.padding = '10px 20px';
+    cancelButton.style.borderRadius = '5px';
+    cancelButton.style.cursor = 'pointer';
+    cancelButton.addEventListener('click', () => {
+        dialog.remove();
+    });
+
+    buttonContainer.appendChild(confirmButton);
+    buttonContainer.appendChild(cancelButton);
+
+    dialog.appendChild(messageEl);
+    dialog.appendChild(buttonContainer);
+
+    document.body.appendChild(dialog);
+}
+
+// Render the initial data on page load
+document.addEventListener('DOMContentLoaded', () => {
+    renderFeedbackTable();
+    renderIdeaBacklog();
 });
-
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
-
-document.getElementById('add-story-button').addEventListener('click', function () {
-            const tableBody = document.querySelector('#user-stories-table tbody');
-            const newRow = `
-                <tr>
-                    <td><input type="text" name="feature[]" required></td>
-                    <td><textarea name="userStory[]" rows="3" required></textarea></td>
-                    <td><textarea name="acceptanceCriteria[]" rows="3" required></textarea></td>
-                    <td>
-                        <select name="storyType[]" required>
-                            <option value="feature">Feature</option>
-                            <option value="bug">Bug</option>
-                            <option value="task">Task</option>
-                            <option value="enhancement">Enhancement</option>
-                            <option value="infrastructure">Infrastructure Improvement</option>
-                        </select>
-                    </td>
-                    <td><input type="number" name="storyPoints[]" min="1" required></td>
-                    <td>
-                        <select name="assignedDeveloper[]" required>
-                            <option value="Said">Said</option>
-                            <option value="Grace">Grace</option>
-                            <option value="Herman">Herman</option>
-                            <option value="Stanley">Stanley</option>
-                            <option value="Kisavi">Kisavi</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="techStack[]" required>
-                            <option value="frontend">Frontend</option>
-                            <option value="backend">Backend</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="status[]" required>
-                            <option value="incomplete">Incomplete</option>
-                            <option value="done">Done</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button type="button" class="save-button">Save</button>
-                    </td>
-                </tr>`;
-
-            tableBody.insertAdjacentHTML('beforeend', newRow);
-        });
-
-        document.getElementById('user-stories-table').addEventListener('click', function (event) {
-            if (event.target.classList.contains('save-button')) {
-                const row = event.target.closest('tr');
-                const inputs = row.querySelectorAll('input, textarea, select');
-
-                inputs.forEach(input => input.disabled = true);
-                alert('Story saved successfully!');
-            }
-        });
-
-        document.getElementById('user-stories-table').addEventListener('click', function (event) {
-            if (event.target.classList.contains('save-button')) {
-                const tableBody = document.querySelector('#user-stories-table tbody');
-                const newRow = `
-                    <tr>
-                        <td><input type="text" name="feature[]" required></td>
-                        <td><textarea name="userStory[]" rows="3" required></textarea></td>
-                        <td><textarea name="acceptanceCriteria[]" rows="3" required></textarea></td>
-                        <td>
-                            <select name="storyType[]" required>
-                                <option value="feature">Feature</option>
-                                <option value="bug">Bug</option>
-                                <option value="task">Task</option>
-                                <option value="enhancement">Enhancement</option>
-                                <option value="infrastructure">Infrastructure Improvement</option>
-                            </select>
-                        </td>
-                        <td><input type="number" name="storyPoints[]" min="1" required></td>
-                        <td>
-                            <select name="assignedDeveloper[]" required>
-                                <option value="Said">Said</option>
-                                <option value="Grace">Grace</option>
-                                <option value="Herman">Herman</option>
-                                <option value="Stanley">Stanley</option>
-                                <option value="Kisavi">Kisavi</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select name="techStack[]" required>
-                                <option value="frontend">Frontend</option>
-                                <option value="backend">Backend</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select name="status[]" required>
-                                <option value="incomplete">Incomplete</option>
-                                <option value="done">Done</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button type="button" class="save-button">Save</button>
-                        </td>
-                    </tr>`;
-
-                tableBody.insertAdjacentHTML('beforeend', newRow);
-
-                const row = event.target.closest('tr');
-                const inputs = row.querySelectorAll('input, textarea, select');
-
-                inputs.forEach(input => input.disabled = true);
-                alert('Story saved successfully and a new row added!');
-            }
-        });
