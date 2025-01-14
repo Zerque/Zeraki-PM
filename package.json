@@ -1,0 +1,20 @@
+{
+    "name": "express-test",
+    "version": "1.0.0",
+    "description": "Express test application",
+    "main": "app.js",
+    "scripts": {
+        "test": "test-express",
+        "start": "node server.js"
+    },
+    "author": "Shivere",
+    "license": "ISC",
+    "dependencies": {
+        "body-parser": "^1.20.3",
+        "cors": "^2.8.5",
+        "express": "^4.21.2",
+        "path": "^0.12.7",
+        "sqlite3": "^5.1.7",
+        "xlsx": "^0.18.5"
+    }
+}

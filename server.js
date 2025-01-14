@@ -2,6 +2,7 @@ const express = require('express');
 const xlsx = require('xlsx');
 const cors = require('cors');
 const path = require('path');
+const sqlite3 = require("sqlite3").verbose();
 
 // Initialize express app
 const app = express();
